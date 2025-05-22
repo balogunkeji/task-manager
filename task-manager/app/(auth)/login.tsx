@@ -22,7 +22,7 @@ const Login = () => {
                     <FormInput labelText={'Email'} placeholder={'Enter your email'} />
                     <ThemedText type={'defaultTitle'} style={{fontSize: 12, alignSelf: 'flex-end'}}>Forgot password?</ThemedText>
                 </View>
-                <Button text={'Login'} onPress={() => console.log('Login')} color={'#fff'} $maxWidth={'100%'} style={{backgroundColor: 'black'}}/>
+                <Button text={'Login'} onPress={() => router.push('/home')} color={'#fff'} $maxWidth={'100%'} style={{backgroundColor: 'black'}}/>
                 <View style={{flexDirection: 'row', justifyContent: 'center'}}>
                     <ThemedText type={'default'}>Don't have an account?</ThemedText>
                     <TouchableOpacity onPress={() => router.push("/register")}>
