@@ -1,11 +1,11 @@
 import {View, Text} from "react-native";
 
-const Search = () => {
+const Browse = () => {
     return (
         <View>
-            <Text>Search</Text>
+            <Text>Browse</Text>
         </View>
     )
 }
 
-export default Search;
+export default Browse;
