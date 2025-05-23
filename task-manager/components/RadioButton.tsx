@@ -11,7 +11,7 @@ const RadioButton: React.FC<Props> = ({ label, selected, onPress }) => {
     return (
         <TouchableOpacity style={styles.container} onPress={onPress}>
             <View style={styles.radio}>
-                {selected && <View></View>}
+                {selected && <View><Text>✓️</Text></View>}
             </View>
             <Text style={styles.label}>{label}</Text>
         </TouchableOpacity>
@@ -22,7 +22,7 @@ const styles = StyleSheet.create({
     container: {
         flexDirection: 'row',
         alignItems: 'center',
-        marginVertical: 8,
+        // marginVertical: 8,
     },
     radio: {
         height: 20,

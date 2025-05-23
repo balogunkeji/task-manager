@@ -1,10 +1,11 @@
-import {View, Text} from "react-native";
+import {View, Text, SafeAreaView} from "react-native";
+import {ThemedText} from "@/components/ThemedText";
 
 const Upcoming = () => {
     return (
-    <View>
-        <Text>Upcoming</Text>
-    </View>
+    <SafeAreaView style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
+        <ThemedText type={'title'}>Upcoming</ThemedText>
+    </SafeAreaView>
     )
 }
 

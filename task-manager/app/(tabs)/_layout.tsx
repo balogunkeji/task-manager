@@ -1,8 +1,8 @@
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { Tabs } from 'expo-router';
-import {Calendar, Calendar1, Home2, Notepad2, SearchNormal1} from "iconsax-react-nativejs";
+import {Calendar, Calendar1, Home2, Notepad2, SearchNormal1, User} from "iconsax-react-nativejs";
 
-export default function TabLayout() {
+ function TabLayout() {
     return (
         <Tabs screenOptions={{ tabBarActiveTintColor: '#666666', tabBarInactiveTintColor: 'black', tabBarStyle: {
             paddingTop: 10,
@@ -32,14 +32,15 @@ export default function TabLayout() {
                 }}
             />
             <Tabs.Screen
-                name="browse"
+                name="user"
                 options={{
                     headerShown: false,
-                    title: 'Browse',
-                    tabBarIcon: ({ color }) => <Notepad2 size={24} color={color} />,
+                    title: 'User',
+                    tabBarIcon: ({ color }) => <User size={24} color={color} />,
                 }}
             />
         </Tabs>
 
     );
 }
+export default TabLayout;
