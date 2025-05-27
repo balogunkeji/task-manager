@@ -106,6 +106,7 @@ const styles = StyleSheet.create({
         borderRadius: 8,
         paddingHorizontal: 12,
         fontSize: 16,
+        textTransform: "lowercase",
     },
     leftContent: {
         position: "absolute",

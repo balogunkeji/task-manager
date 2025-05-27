@@ -2,13 +2,20 @@ import {SafeAreaView, View, StyleSheet, Image, TouchableOpacity} from "react-nat
 import {BackButton} from "@/components/Back";
 import {Asset} from "expo-asset";
 import {ThemedText} from "@/components/ThemedText";
-import {FormInput} from "@/components/FormInput";
+import {FormInput, mapFormikProps} from "@/components/FormInput";
 import {Button} from "@/components/Button";
 import {useRouter} from "expo-router";
+import {useState} from "react";
+import {Formik} from "formik";
+import * as Yup from "yup";
+import axios from "axios";
+import Notification from "@/components/Notification";
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const Login = () => {
     const logo = Asset.fromModule(require("../../assets/images/login.png")).uri;
     const router = useRouter();
+    const [notif, setNotif] = useState<{ message: string; type: 'info' | 'success' | 'warning' | 'error' } | null>(null);
     return(
         <SafeAreaView style={styles.container}>
             <BackButton/>
@@ -16,20 +23,69 @@ const Login = () => {
                 <Image source={{uri: logo}} resizeMode="contain" style={{width: 250, height: 300}}/>
                 <ThemedText type={'title'} style={{marginTop: -20}}>Login</ThemedText>
             </View>
-            <View style={styles.formContainer}>
-                <FormInput labelText={'Email'} placeholder={'Enter your email'} />
-                <View>
-                    <FormInput labelText={'Email'} placeholder={'Enter your email'} />
-                    <ThemedText type={'defaultTitle'} style={{fontSize: 12, alignSelf: 'flex-end'}}>Forgot password?</ThemedText>
-                </View>
-                <Button text={'Login'} onPress={() => router.push('/home')} color={'#fff'} $maxWidth={'100%'} style={{backgroundColor: 'black'}}/>
-                <View style={{flexDirection: 'row', justifyContent: 'center'}}>
-                    <ThemedText type={'default'}>Don't have an account?</ThemedText>
-                    <TouchableOpacity onPress={() => router.push("/register")}>
-                        <ThemedText type={'defaultSemiBold'}>Register</ThemedText>
-                    </TouchableOpacity>
-                </View>
-            </View>
+            <Formik
+                initialValues={{ email: '', password: '' }}
+                validationSchema={Yup.object({
+                    email: Yup.string().email('Invalid email').required('Email is required'),
+                    password: Yup.string().min(8, 'Minimum 8 characters').required('Password is required'),
+                })}
+                onSubmit={async (values) => {
+                    try {
+                        const res = await axios.post(
+                            'https://express-js-1z8q.onrender.com/users/login',
+                            {
+                                email: values.email,
+                                password: values.password,
+                            },
+                            { headers: { 'Content-Type': 'application/json' } }
+                        );
+                        await AsyncStorage.setItem('token', res.data.token);
+                        setNotif({ message: 'Login successful!', type: 'success' });
+
+                        // Navigate after 2 seconds
+                        setTimeout(() => {
+                            router.push('/(tabs)/home'); // Change this to your actual dashboard/home screen
+                        }, 2000);
+                    } catch (err: any) {
+                        const errorMessage =
+                            err.response?.data?.errors
+                                ? Object.values(err.response.data.errors).join(', ')
+                                : 'An error occurred';
+
+                            setNotif({ message: errorMessage, type: 'error' });
+                        setTimeout(() => {
+                            router.push('/register'); // Change this to your actual dashboard/home screen
+                        }, 2000);
+                        console.log(err.response?.data?.errors);
+                    }
+                }}
+
+            >
+                {(formik) => (
+                    <View style={styles.formContainer}>
+                        <FormInput labelText={'Email'} placeholder={'Enter your email'} {...mapFormikProps('email', formik)}/>
+                        <View>
+                            <FormInput labelText={'Password'} placeholder={'Enter your password'} {...mapFormikProps('password', formik)}/>
+                            <ThemedText type={'defaultTitle'} style={{fontSize: 12, alignSelf: 'flex-end'}}>Forgot password?</ThemedText>
+                        </View>
+                        <Button text={'Login'} onPress={formik.handleSubmit} color={'#fff'} $maxWidth={'100%'} style={{backgroundColor: 'black'}}/>
+                        <View style={{flexDirection: 'row', justifyContent: 'center'}}>
+                            <ThemedText type={'default'}>Don't have an account?</ThemedText>
+                            <TouchableOpacity onPress={() => router.push("/register")}>
+                                <ThemedText type={'defaultSemiBold'}>Register</ThemedText>
+                            </TouchableOpacity>
+                        </View>
+                    </View>
+                )}
+            </Formik>
+            {notif && (
+                <Notification
+                    message={notif.message}
+                    type={notif.type}
+                    onHide={() => setNotif(null)}
+                /> as any
+            )}
+
         </SafeAreaView>
     )
 }
