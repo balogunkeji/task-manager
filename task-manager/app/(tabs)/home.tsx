@@ -3,7 +3,7 @@ import {
     StyleSheet,
     View,
     TouchableOpacity,
-    TouchableWithoutFeedback
+    TouchableWithoutFeedback, ActivityIndicator
 } from "react-native";
 import { ThemedText } from "@/components/ThemedText";
 import React, { useCallback, useRef, useState } from "react";
@@ -33,8 +33,13 @@ function HomeScreen() {
     const closeSheet = () => {
         bottomSheetRef2.current?.close();
     };
-    if (isLoading) return null; // Prevent premature redirect
-    if (!session) return <Redirect href="/(auth)/login" />;
+    if (isLoading) {
+        return (
+            <SafeAreaView style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+                <ActivityIndicator size="large" color="#000" />
+            </SafeAreaView>
+        );
+    }    if (!session) return <Redirect href="/(auth)/login" />;
     return (
         <SafeAreaView style={styles.container}>
             <View style={styles.tasksContainer}>

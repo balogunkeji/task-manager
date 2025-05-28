@@ -1,12 +1,21 @@
-import {View, Text, SafeAreaView, StyleSheet} from "react-native";
+import {View, Text, SafeAreaView, StyleSheet, ActivityIndicator} from "react-native";
 import {FormInput} from "@/components/FormInput";
 import {ThemedText} from "@/components/ThemedText";
 import {SearchNormal} from "iconsax-react-nativejs";
 import {useSession} from "@/components/ctx";
+import {Redirect} from "expo-router";
+import React from "react";
 
 const Search = () => {
     const { session, isLoading } = useSession();
-
+    if (isLoading) {
+        return (
+            <SafeAreaView style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+                <ActivityIndicator size="large" color="#000" />
+            </SafeAreaView>
+        );
+    }
+    if (!session) return <Redirect href="/(auth)/login" />;
     return (
         <SafeAreaView style={styles.container}>
             <View style={styles.form}>

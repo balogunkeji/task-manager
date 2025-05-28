@@ -3,15 +3,16 @@ import {
     SafeAreaView,
     StyleSheet,
     Image,
-    TouchableOpacity
+    TouchableOpacity, ActivityIndicator
 } from "react-native";
 import { ThemedText } from "@/components/ThemedText";
 import { ArrowRight2, Logout, Notification } from "iconsax-react-nativejs";
 import { FormInput } from "@/components/FormInput";
-import { useCallback, useRef, useState } from "react";
+import React, { useCallback, useRef, useState } from "react";
 import BottomSheet from "@gorhom/bottom-sheet";
 import ReusableBottomSheet from "@/components/ReusableBottomSheet";
 import { useSession } from "@/components/ctx";
+import {Redirect} from "expo-router";
 
 const User = () => {
     const [user, setUser] = useState({
@@ -19,21 +20,22 @@ const User = () => {
         email: '',
         password: '',
     });
-
+    const { signOut, isLoading, session } = useSession();
     const bottomSheetRef = useRef<BottomSheet>(null);
     const bottomSheetRef2 = useRef<BottomSheet>(null);
-
-    // Removed snapToIndex from these callbacks to prevent auto-open
     const handleSheetChanges = useCallback((index: number) => {
-        // You can log the index here if needed
     }, []);
-
     const handleSheetChange = useCallback((index: number) => {
-        // You can log the index here if needed
     }, []);
 
-    const { signOut } = useSession();
-
+    if (isLoading) {
+        return (
+            <SafeAreaView style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+                <ActivityIndicator size="large" color="#000" />
+            </SafeAreaView>
+        );
+    }
+    if (!session) return <Redirect href="/(auth)/login" />;
     return (
         <SafeAreaView style={styles.container}>
             <View style={styles.header}>
