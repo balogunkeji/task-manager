@@ -2,8 +2,11 @@ import {View, Text, SafeAreaView, StyleSheet} from "react-native";
 import {FormInput} from "@/components/FormInput";
 import {ThemedText} from "@/components/ThemedText";
 import {SearchNormal} from "iconsax-react-nativejs";
+import {useSession} from "@/components/ctx";
 
 const Search = () => {
+    const { session, isLoading } = useSession();
+
     return (
         <SafeAreaView style={styles.container}>
             <View style={styles.form}>

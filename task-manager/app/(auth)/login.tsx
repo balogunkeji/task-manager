@@ -8,13 +8,13 @@ import {useRouter} from "expo-router";
 import {useState} from "react";
 import {Formik} from "formik";
 import * as Yup from "yup";
-import axios from "axios";
 import Notification from "@/components/Notification";
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import {useSession} from "@/components/ctx";
 
 const Login = () => {
     const logo = Asset.fromModule(require("../../assets/images/login.png")).uri;
     const router = useRouter();
+    const { signIn, session } = useSession();
     const [notif, setNotif] = useState<{ message: string; type: 'info' | 'success' | 'warning' | 'error' } | null>(null);
     return(
         <SafeAreaView style={styles.container}>
@@ -31,35 +31,17 @@ const Login = () => {
                 })}
                 onSubmit={async (values) => {
                     try {
-                        const res = await axios.post(
-                            'https://express-js-1z8q.onrender.com/users/login',
-                            {
-                                email: values.email,
-                                password: values.password,
-                            },
-                            { headers: { 'Content-Type': 'application/json' } }
-                        );
-                        await AsyncStorage.setItem('token', res.data.token);
+                        await signIn(values.email, values.password);
                         setNotif({ message: 'Login successful!', type: 'success' });
 
-                        // Navigate after 2 seconds
                         setTimeout(() => {
-                            router.push('/(tabs)/home'); // Change this to your actual dashboard/home screen
-                        }, 2000);
+                            router.push('/(tabs)/home');
+                        }, 1500);
+                        console.log(session);
                     } catch (err: any) {
-                        const errorMessage =
-                            err.response?.data?.errors
-                                ? Object.values(err.response.data.errors).join(', ')
-                                : 'An error occurred';
-
-                            setNotif({ message: errorMessage, type: 'error' });
-                        setTimeout(() => {
-                            router.push('/register'); // Change this to your actual dashboard/home screen
-                        }, 2000);
-                        console.log(err.response?.data?.errors);
+                        setNotif({ message: err.message || 'An error occurred', type: 'error' });
                     }
                 }}
-
             >
                 {(formik) => (
                     <View style={styles.formContainer}>
