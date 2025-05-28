@@ -3,7 +3,7 @@ import {
     StyleSheet,
     View,
     TouchableOpacity,
-    TouchableWithoutFeedback, ActivityIndicator
+    TouchableWithoutFeedback, ActivityIndicator, Platform
 } from "react-native";
 import { ThemedText } from "@/components/ThemedText";
 import React, { useCallback, useRef, useState } from "react";
@@ -14,6 +14,9 @@ import ReusableBottomSheet from "@/components/ReusableBottomSheet";
 import { FormInput } from "@/components/FormInput";
 import {useSession} from "@/components/ctx";
 import {Redirect} from "expo-router";
+import {useTask} from "@/hooks/useTask";
+import DateTimePicker from '@react-native-community/datetimepicker';
+
 
 function HomeScreen() {
     const bottomSheetRef = useRef<BottomSheet>(null);
@@ -21,25 +24,50 @@ function HomeScreen() {
     const [selected, setSelected] = useState('option1');
     const [isSheetOpen, setIsSheetOpen] = useState(false);
     const { session, isLoading } = useSession();
+    const [value, setValue] = useState({
+        title: '',
+        description: '',
+        completed: false,
+        priority: '',
+        dueDate: '',
+        labels: [],
+    });
+    console.log(value)
+    const [show, setShow] = useState(false);
+    const { createTask } = useTask(value,session)
     const handleSheetChanges = useCallback((index: number) => {
         bottomSheetRef.current?.snapToIndex(index);
     }, []);
+    const onChange = (_event: any, selectedDate?: Date) => {
+        setShow(Platform.OS === 'ios');
+        if (selectedDate) {
+            setValue({ ...value, dueDate: selectedDate.toISOString() });
+        }
+    };
+    const closeSheet = () => {
+        bottomSheetRef2.current?.close();
+    };
+
+    const handleTask = useCallback(async () => {
+        try {
+            const task = await createTask();
+            console.log("Task created:", task);
+            closeSheet();
+        } catch (err: any) {
+            alert(err.message || "Failed to create task.");
+        }
+    }, [createTask])
 
     // ✅ Updated: No snapToIndex call here
     const handleSheetChange = useCallback((index: number) => {
         setIsSheetOpen(index !== -1);
     }, []);
 
-    const closeSheet = () => {
-        bottomSheetRef2.current?.close();
-    };
+
     if (isLoading) {
-        return (
-            <SafeAreaView style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-                <ActivityIndicator size="large" color="#000" />
-            </SafeAreaView>
-        );
-    }    if (!session) return <Redirect href="/(auth)/login" />;
+        return null
+    }
+    if (!session) return <Redirect href="/(auth)/login" />;
     return (
         <SafeAreaView style={styles.container}>
             <View style={styles.tasksContainer}>
@@ -89,10 +117,11 @@ function HomeScreen() {
                 snapPoints={['25%']}
             >
                 <View style={{ width: '100%' }}>
-                    <FormInput labelText={''} placeholder={'e.g. Search flights for upcoming trip p2'} style={{ borderWidth: 0 }} />
-                    <FormInput labelText={''} placeholder={'Description'} style={{ borderWidth: 0 }} />
+                    <FormInput labelText={''} placeholder={'e.g. Search flights for upcoming trip p2'} style={{ borderWidth: 0 }} value={value.title}  onChangeText={(text) => setValue((prev) => ({ ...prev, title: text }))}
+                    />
+                    <FormInput labelText={''} placeholder={'Description'} style={{ borderWidth: 0 }}  value={value.description} onChangeText={(text) => setValue((prev) => ({ ...prev, description: text }))}/>
                     <View style={{ flexDirection: 'row', gap: 20 }}>
-                        <TouchableOpacity style={styles.box}>
+                        <TouchableOpacity style={styles.box} onPress={() => setShow(true)}>
                             <Calendar size={20} color={'#444'} />
                             <ThemedText type={'subtitle'} style={{ fontSize: 14 }}>Date</ThemedText>
                         </TouchableOpacity>
@@ -105,8 +134,22 @@ function HomeScreen() {
                             <ThemedText type={'subtitle'} style={{ fontSize: 14 }}>Labels</ThemedText>
                         </TouchableOpacity>
                     </View>
+                    <View style={{justifyContent: 'center', width: '100%', alignItems: 'center', marginTop: 15}}>
+                        <TouchableOpacity onPress={handleTask}>
+                            <ThemedText type={'subtitle'} style={{fontSize: 16, color: 'orangered'}}>Done</ThemedText>
+                        </TouchableOpacity>
+                    </View>
                 </View>
+                {show && (
+                    <DateTimePicker
+                        value={value.dueDate ? new Date(value.dueDate) : new Date()}
+                        mode="date"
+                        display="default"
+                        onChange={onChange}
+                    />
+                )}
             </ReusableBottomSheet>
+
         </SafeAreaView>
     );
 }
