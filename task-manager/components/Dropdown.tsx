@@ -45,15 +45,16 @@ export default function Dropdown({ options, selected, onSelect, placeholder }: D
 
 const styles = StyleSheet.create({
     dropdown: {
-        borderWidth: 1,
-        borderColor: '#ccc',
-        paddingVertical: 12,
-        paddingHorizontal: 16,
-        borderRadius: 8,
-        backgroundColor: '#fff',
+        // borderWidth: 1,
+        // borderColor: '#ccc',
+        // paddingVertical: 12,
+        // paddingHorizontal: 16,
+        // borderRadius: 8,
+        // backgroundColor: '#fff',
     },
     selectedText: {
-        color: '#333',
+        color: '#000',
+        fontWeight: 'bold',
     },
     overlay: {
         flex: 1,

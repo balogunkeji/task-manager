@@ -1,12 +1,12 @@
 import axios from "axios";
 
-interface TaskValues {
+export interface TaskValues {
     title: string;
-    description?: string;
-    completed?: boolean;
-    priority?: string;
-    dueDate?: string;
-    labels?: string[];
+    description: string;
+    completed: boolean;
+    priority: string;
+    dueDate: string;
+    labels: string[];
 }
 
 export const useTask = (values: TaskValues, token: string | null | undefined) => {

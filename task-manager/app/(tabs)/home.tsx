@@ -14,8 +14,10 @@ import ReusableBottomSheet from "@/components/ReusableBottomSheet";
 import { FormInput } from "@/components/FormInput";
 import {useSession} from "@/components/ctx";
 import {Redirect} from "expo-router";
-import {useTask} from "@/hooks/useTask";
+import {TaskValues, useTask} from "@/hooks/useTask";
 import DateTimePicker from '@react-native-community/datetimepicker';
+import Dropdown from "@/components/Dropdown";
+import LabelInputDropdown from "@/components/LabelInputDropdown";
 
 
 function HomeScreen() {
@@ -24,7 +26,7 @@ function HomeScreen() {
     const [selected, setSelected] = useState('option1');
     const [isSheetOpen, setIsSheetOpen] = useState(false);
     const { session, isLoading } = useSession();
-    const [value, setValue] = useState({
+    const [value, setValue] = useState<TaskValues>({
         title: '',
         description: '',
         completed: false,
@@ -127,11 +129,21 @@ function HomeScreen() {
                         </TouchableOpacity>
                         <TouchableOpacity style={styles.box}>
                             <Flag size={20} color={'#444'} />
-                            <ThemedText type={'subtitle'} style={{ fontSize: 14 }}>Priority</ThemedText>
+                            <Dropdown
+                                options={['Low', 'Medium', 'High']}
+                                selected={value.priority}
+                                onSelect={(val) => setValue((prev) => ({ ...prev, priority: val }))}
+                                placeholder="Priority"
+                            />
                         </TouchableOpacity>
                         <TouchableOpacity style={styles.box}>
                             <Tag size={20} color={'#444'} />
-                            <ThemedText type={'subtitle'} style={{ fontSize: 14 }}>Labels</ThemedText>
+                            <LabelInputDropdown
+                                labels={value.labels}
+                                onChange={(labels) =>
+                                    setValue((prev) => ({ ...prev, labels }))
+                                }
+                            />
                         </TouchableOpacity>
                     </View>
                     <View style={{justifyContent: 'center', width: '100%', alignItems: 'center', marginTop: 15}}>
